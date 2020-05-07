@@ -1,7 +1,8 @@
 import os, math, time
-from random import randrange, getrandbits
+from random import randrange, getrandbits, randint
+from typing import Tuple
 
-def is_prime(n, k=128):
+def is_prime(n: int, k: int=128):
     """
     Miller-Rabin algorithm
 
@@ -40,7 +41,7 @@ def gen_prime_cand(size):
     p |= (1 << size-1) | 1
     return p
 
-def sample_prime(size: int) -> int:
+def sample_prime_with_bit_size(size: int, silence=True) -> int:
     num = gen_prime_cand(size)
 
     sample_times = 0
@@ -49,7 +50,40 @@ def sample_prime(size: int) -> int:
         num = gen_prime_cand(size)
         sample_times += 1
     t2 = time.time()
-    print("total sample times: {}, average judge time: {:.3f}".format(
-        sample_times, (t2 - t1) / sample_times
-    ))
+    if not silence:
+        print("total sample times: {}, average judge time: {:.3f}".format(
+            sample_times, (t2 - t1) / sample_times
+        ))
     return num
+
+def sample_prime_with_upper_bound(upper_bound: int, silence=True) -> int:
+    num = randint(2, upper_bound)
+
+    sample_times = 0
+    t1 = time.time()
+    while not is_prime(num):
+        num = randint(2, upper_bound)
+        sample_times += 1
+    t2 = time.time()
+    if not silence:
+        print("total sample times: {}, average judge time: {:.3f}s".format(
+            sample_times, (t2 - t1) / sample_times
+        ))
+    return num
+
+def ext_euclid(a: int, b: int) -> Tuple[int, int]:
+    """ Extented Euclidian Algorithm
+    details see here: https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
+    """
+    s_old, s = 1, 0
+    t_old, t = 0, 1
+    r_old, r = a, b
+    if b == 0:
+        return (1, 0)
+    else:
+        while r != 0:
+            q = r_old // r
+            r_old, r = r, r_old - q * r
+            s_old, s = s, s_old - q * s
+            t_old, t = t, t_old - q * t
+    return (s_old, t_old)
