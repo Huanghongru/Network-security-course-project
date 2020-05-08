@@ -74,6 +74,9 @@ def sample_prime_with_upper_bound(upper_bound: int, silence=True) -> int:
 def ext_euclid(a: int, b: int) -> Tuple[int, int]:
     """ Extented Euclidian Algorithm
     details see here: https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
+
+    usually we want x > 0, we can convert it to equivalent integer like this:
+    https://crypto.stackexchange.com/questions/10805/how-does-one-deal-with-a-negative-d-in-rsa
     """
     s_old, s = 1, 0
     t_old, t = 0, 1
@@ -86,4 +89,20 @@ def ext_euclid(a: int, b: int) -> Tuple[int, int]:
             r_old, r = r, r_old - q * r
             s_old, s = s, s_old - q * s
             t_old, t = t, t_old - q * t
-    return (s_old, t_old)
+
+    x, y = s_old, t_old
+    x %= b
+    while x < 0:
+        x += b
+    return (x, y)
+
+def exp_by_square(x: int, n: int) -> int:
+    """
+    compute x ^ n in O(logn)
+    """
+    if n == 1:
+        return x
+    if n % 2:
+        return x * exp_by_square(x ** 2, (n-1) // 2)
+    else:
+        return exp_by_square(x ** 2, n // 2)
