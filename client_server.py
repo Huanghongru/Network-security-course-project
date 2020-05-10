@@ -1,23 +1,28 @@
 import os, random
 
 from rsa import RSA
+from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
 from typing import Dict, List, Tuple
 
-def WUP(content: str, mac: str, imei: str) -> List[str]:
+def WUP(content: str, mac: str, imei: str) -> List[bytes]:
     """
     The format of the WUP request
-    | ID - 4 bytes | content - 1024 bytes | mac - 4 bytes | imei - 5 bytes |
+    | content - 1024 bytes | mac - 7 bytes | imei - 7 bytes | SHA - 64 bytes |
 
     If the content is longer than 1024 bytes, we truncate it to pieces.
     """
     ret = []
-    wup_id = str(random.randint(1000, 9999))
     for i in range(0, len(content), 1024):
         sub_content = content[i: min(len(content), i + 1024)]
         if len(sub_content) < 1024:
             sub_content += " " * (1024 - len(sub_content))
-        ret.append("\t".join([wup_id, sub_content, mac, imei]))
+        text = "\t".join([sub_content, mac, imei]).encode('utf-8')
+
+        sha = SHA256.new()
+        sha.update(text)
+        checksum = sha.hexdigest().encode('utf-8')
+        ret.append(text + checksum)
     return ret
 
 
@@ -27,8 +32,8 @@ class Client(object):
         self.rsa = RSA()    # RSA key pair of this user
         self.rsa.generate_key_pairs()
 
-        self.mac = str(random.randint(1000, 9999))   # MAC address of user
-        self.imei = str(random.randint(10000, 99999))  # IMEI series
+        self.mac = str(random.randint(1000000, 9999999))   # MAC address of user
+        self.imei = str(random.randint(1000000, 9999999))  # IMEI series
 
     def send_request(self, content) -> List[Tuple]:
         """
@@ -44,7 +49,7 @@ class Client(object):
 
         # use the AES session key to ecrypt the WUP request
         wups = WUP(content, self.mac, self.imei)
-        encrypted_wups = [aes.encrypt(bytes(wup, 'utf-8')) for wup in wups]
+        encrypted_wups = [aes.encrypt(wup) for wup in wups]
 
         # send the RSA-encrypted AES session key and the 
         # encrypted WUP request to the server.
@@ -60,6 +65,7 @@ class Server(object):
     def process_request(self, request: List[Tuple]) -> bool:
         """
         process a WUP request sended by the user. 
+        return True if it is a valid WUP request and False otherwise.
 
         Args:
         ----
@@ -77,14 +83,19 @@ class Server(object):
         # decrypt the WUP request using the AES session key
         plain_text = ""
         for _, _, req in request:
-            try:
-                # if we can't decode the content in utf-8 encoding.
-                # it should be an invalid WUP request
-                wup_id, content, mac, imei = aes.decrypt(req).decode('utf-8').split('\t')
-                plain_text += content.strip()
-            except:
-                print("Invalid WUP request")
+            dt = aes.decrypt(req)
+            text, checksum = dt[:-64], dt[-64:]
+
+            sha = SHA256.new()
+            sha.update(text)
+            if checksum != sha.hexdigest().encode('utf-8'):
+                print(checksum)
+                print(sha.hexdigest().encode('utf-8'))
+                print("Invalid WUP request. checksum not equal")
                 return False
+
+            content, mac, imei = text.decode('utf-8').split('\t')
+            plain_text += content.strip()
         print(plain_text)
         return True
 
