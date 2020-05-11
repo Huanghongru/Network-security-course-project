@@ -1,4 +1,4 @@
-import os, random
+import os, random, utils
 
 from rsa import RSA
 from Crypto.Hash import SHA256
@@ -41,8 +41,8 @@ class Client(object):
         """
         
         # generate a 128-bit AES session key
-        aes_key = str(random.randint(1e15, 9e15))
-        aes = AES.new(aes_key)
+        aes_key = random.getrandbits(128)
+        aes = AES.new(aes_key.to_bytes(16, 'big'))
 
         # encrypt this session key using a 1024-bit RSA public key
         encrypted_aes_key = self.rsa.encrypt(aes_key)
@@ -78,7 +78,8 @@ class Server(object):
             print("The user of this request is not registered !")
             return False
         aes_key = self.client2rsa[request_user_id].decrypt(encrypted_aes_key)
-        aes = AES.new(aes_key)
+        aes_key = aes_key[0] & utils.bit_mask(128)
+        aes = AES.new(aes_key.to_bytes(16, 'big'))
 
         # decrypt the WUP request using the AES session key
         plain_text = ""
@@ -89,14 +90,14 @@ class Server(object):
             sha = SHA256.new()
             sha.update(text)
             if checksum != sha.hexdigest().encode('utf-8'):
-                print(checksum)
-                print(sha.hexdigest().encode('utf-8'))
+                # print(checksum)
+                # print(sha.hexdigest().encode('utf-8'))
                 print("Invalid WUP request. checksum not equal")
                 return False
 
             content, mac, imei = text.decode('utf-8').split('\t')
             plain_text += content.strip()
-        print(plain_text)
+        print("Valid WUP with plain text: {}".format(plain_text))
         return True
 
 
@@ -126,4 +127,4 @@ def test_communicate():
     # server -> user1
     print(server.process_request(req1))
 
-test_communicate()
+# test_communicate()
