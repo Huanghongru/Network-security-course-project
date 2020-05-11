@@ -36,18 +36,27 @@ def is_prime(n: int, k: int=128):
                 return False
     return True
 
-def gen_prime_cand(size):
+def randint_with_bit_size(size):
     p = getrandbits(size)
     p |= (1 << size-1) | 1
     return p
 
+def byte_size(num: int) -> int:
+    return num.bit_length() // 8 + 1
+
+def bit_mask(size: int) -> int:
+    mask = 0
+    for _ in range(size):
+        mask = (mask << 1) + 1
+    return mask
+
 def sample_prime_with_bit_size(size: int, silence=True) -> int:
-    num = gen_prime_cand(size)
+    num = randint_with_bit_size(size)
 
     sample_times = 0
     t1 = time.time()
     while not is_prime(num):
-        num = gen_prime_cand(size)
+        num = randint_with_bit_size(size)
         sample_times += 1
     t2 = time.time()
     if not silence:
