@@ -40,14 +40,23 @@ class RSA(object):
         self.private_key = (n, d)
         return (n, e)
 
-    def encrypt(self, plain_text: str) -> List[int]:
+    def encrypt(self, plain_text: Union[str, int]) -> List[int]:
         """ 
         Encrypt a piece of plain text into cipher text.
+        
         Firstly obtian the utf-8 value of each character in the str.
-        We compute the cipher number of each utf-8 value.
+        We compute the cipher number of each utf-8 value. In this way,
+        the chunk size can be regarded as 1 byte.
         """
         n, e = self.public_key
-        bs = [b for b in str.encode(plain_text)]
+        if type(plain_text) is str:
+            bs = [b for b in str.encode(plain_text)]
+        else:
+            bs = []
+            mask = utils.bit_mask(self.size)
+            while plain_text:
+                bs.append(plain_text & mask)
+                plain_text >>= self.size
 
         t1 = time.time()
         cipher_text = [pow(u, e, n) for u in bs]
@@ -58,12 +67,15 @@ class RSA(object):
                 sys.getsizeof(plain_text), t2-t1))
         return cipher_text
 
-    def decrypt(self, cipher_text: List[int]) -> str:
+    def decrypt(self, cipher_text: List[int]) -> List[int]:
         """
         Decrypt a piece of cipher text using the private key
 
         To deal with negative d in private key,
         Use pow() to quickly compute c ^ d % n.
+
+        We are not sure the decoding way of the plain text
+        so we just return bytes.
         """
         n, d = self.private_key
         
@@ -74,20 +86,29 @@ class RSA(object):
         if self.verbose:
             print("| decrypt {}bytes cipher text in {:.3f}s".format(
                 sys.getsizeof(cipher_text), t2-t1))
-        return bytearray(plain_text).decode()
+        return plain_text
         
 
 def test_rsa():
-    sizes = [32, 252, 512, 1024, 2048]
+    sizes = [252, 512, 1024, 2048]
     for size in sizes:
         r = RSA(size, verbose=True)
         pk = r.generate_key_pairs()
         print("| Test RSA algorithm with key size {}bit".format(size))
         with open("test.txt", "r") as f:
             for text in f.readlines():
-                text = text.strip()
-                ct = r.encrypt(text)
-                pt = r.decrypt(ct)
-                assert pt == text, "failed"
+                text_type, text = text.strip().split('\t')
+                if text_type == "str":
+                    ct = r.encrypt(text)
+                    pt = r.decrypt(ct)
+                    pt = bytearray(pt).decode()
+                    assert pt == text, "failed"
+                else:
+                    ct = r.encrypt(eval(text))
+                    pt = r.decrypt(ct)
+                    pt_ = 0
+                    for num in pt[::-1]:
+                        pt_ = (pt_ << r.size) + num
+                    assert pt_ == int(text), "failed"
         print("| All test passed!")
 
