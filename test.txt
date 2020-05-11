@@ -1,10 +1,12 @@
-hello world !!!
-no pain, no gain
-wei cheng yong xiao is a good person
-魏程涌潇是世界上最好的舍友
-precision is fraction of retrieved docs that are relevant
-recall is fraction of relevant docs that are retrieved
-I haven't heard of the result of such a process being used in cryptography though; usually it's the modulus of said power that matters. If it's the same in your case then you can just use the 3-argument form of pow() instead.
-You shouldn't try to calculate x^y directly for huge values of y - as has already been pointed out, this is pretty difficult to do (takes lots of space and processing power). You need to look at algorithms that solve the problem for you with fewer multiplication operations. Take a look at: http://en.wikipedia.org/wiki/Exponentiation_by_squaring for starters.
-RSA (Rivest–Shamir–Adleman) is an algorithm used by modern computers to encrypt and decrypt messages. It is an asymmetric cryptographic algorithm. Asymmetric means that there are two different keys. This is also called public key cryptography, because one of the keys can be given to anyone. The other key must be kept private. The algorithm is based on the fact that finding the factors of a large composite number is difficult: when the factors are prime numbers, the problem is called prime factorization. It is also a key pair (public and private key) generator.
-关注今年旗舰级智能手机的朋友会发现，除了5G之外，还有一个概念经常被各大手机厂商提起，那就是WiFi6。WiFi6指的是第六代无线网络技术，目前我们所使用的的无线网络技术主要还是WiFi5，说到这里你可能还不是很理解，但2.4G和5G这两个WiFi频段大家可能都会听到过。WiFi6最主要的体现是它具有更高的传输速率以及提高整体传输容量，说白了就是网速更快了。十分有幸从头条众测拿到了华为路由AX3 Pro这款路由器，下面就和我一起来体验一下WiFi6所带来的体验吧。
+str	hello world !!!
+str	no pain, no gain
+str	wei cheng yong xiao is a good person
+str	魏程涌潇是世界上最好的舍友
+str	precision is fraction of retrieved docs that are relevant
+str	recall is fraction of relevant docs that are retrieved
+str	I haven't heard of the result of such a process being used in cryptography though; usually it's the modulus of said power that matters. If it's the same in your case then you can just use the 3-argument form of pow() instead.
+str	You shouldn't try to calculate x^y directly for huge values of y - as has already been pointed out, this is pretty difficult to do (takes lots of space and processing power). You need to look at algorithms that solve the problem for you with fewer multiplication operations. Take a look at: http://en.wikipedia.org/wiki/Exponentiation_by_squaring for starters.
+str	RSA (Rivest–Shamir–Adleman) is an algorithm used by modern computers to encrypt and decrypt messages. It is an asymmetric cryptographic algorithm. Asymmetric means that there are two different keys. This is also called public key cryptography, because one of the keys can be given to anyone. The other key must be kept private. The algorithm is based on the fact that finding the factors of a large composite number is difficult: when the factors are prime numbers, the problem is called prime factorization. It is also a key pair (public and private key) generator.
+str	关注今年旗舰级智能手机的朋友会发现，除了5G之外，还有一个概念经常被各大手机厂商提起，那就是WiFi6。WiFi6指的是第六代无线网络技术，目前我们所使用的的无线网络技术主要还是WiFi5，说到这里你可能还不是很理解，但2.4G和5G这两个WiFi频段大家可能都会听到过。WiFi6最主要的体现是它具有更高的传输速率以及提高整体传输容量，说白了就是网速更快了。十分有幸从头条众测拿到了华为路由AX3 Pro这款路由器，下面就和我一起来体验一下WiFi6所带来的体验吧。
+int	123456789
+int	324234254343
