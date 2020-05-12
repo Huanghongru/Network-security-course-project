@@ -45,71 +45,6 @@ class RSA(object):
         self.private_key = (n, d)
         return (n, e)
 
-    def oaep_encode(self, plain_text: Union[str, int]) -> Union[str, int]:
-        if type(plain_text) is int:
-            m = plain_text << self.oaep_k1
-            r = utils.randint_with_bit_size(self.oaep_k0)
-            
-            X = m ^ self.oaep_G(r)
-            Y = r ^ self.oaep_H(X)
-            plain_text = (X << self.oaep_k0) | Y
-        else:
-            m = plain_text + "0" * (self.oaep_k1 // 8)
-        return plain_text
-
-    def oaep_decode(self, decode_type: str) -> Union[str, int]:
-        pass
-
-    def chunk_encode(self, plain_text: Union[str, int]) -> List[int]:
-        """
-        encode the plain text into chunks of data.
-        these data are represented as integers.
-        """
-        encoded_plain_text = []
-        if type(plain_text) is str:
-            for i in range(0, len(plain_text), self.chunk_size // 8):
-                chunk = plain_text[i: min(len(plain_text), i + self.chunk_size // 8)]#.encode()
-                print(chunk)
-                encoded_plain_text.append(int.from_bytes(chunk, 'big'))
-        else:
-            while plain_text:
-                encoded_plain_text.append(plain_text & utils.bit_mask(self.chunk_size))
-                plain_text >>= self.chunk_size
-        return encoded_plain_text
-
-    def chunk_decode(self, decode_type: str, decrypted_text: List[int]) -> Union[str, int]:
-        """
-        decode the decrypted text to its corresponding type
-        """
-        if decode_type == "str":
-            plain_text = bytearray(decrypted_text).decode()
-        else:
-            plain_text = 0
-            print(len(decrypted_text))
-            for num in decrypted_text[::-1]:
-                plain_text = (plain_text << self.chunk_size) | num
-        return plain_text
-
-    def naive_encode(self, plain_text: Union[str, int]) -> List[int]:
-        if type(plain_text) is str:
-            res = [b for b in str.encode(plain_text)]
-        else:
-            res = []
-            mask = utils.bit_mask(self.size)
-            while plain_text:
-                res.append(plain_text & mask)
-                plain_text >>= self.size
-        return res
-
-    def naive_decode(self, decode_type: str, plain_text: List[int]) -> Union[str, int]:
-        if decode_type == "str":
-            return bytearray(plain_text).decode()
-        else:
-            pt_ = 0
-            for num in plain_text[::-1]:
-                pt_ = (pt_ << self.size) | num
-            return pt_
-
     def encrypt(self, plain_text: Union[str, int]) -> List[int]:
         """ 
         Encrypt a piece of plain text into cipher text.
@@ -164,7 +99,6 @@ class RSA(object):
         return plain_text
         
 
-<<<<<<< HEAD
 def test_rsa(rsa_encode_method):
     sizes = [512, 1024, 2048]
     for size in sizes:
@@ -197,6 +131,3 @@ def test_oaep_encode_and_decode():
         print(ll)
         assert ll == test_case, "failed"
 
-# test_rsa()
-
-# test_oaep_encode_and_decode()

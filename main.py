@@ -5,9 +5,9 @@ from attacker import test_hack
 def main():
     test_rsa("naive")
     test_rsa("oaep")
-    # test_oaep_encode_and_decode()
-    # test_communicate()
-    # test_hack()
+    test_oaep_encode_and_decode()
+    test_communicate()
+    test_hack()
 
 if __name__ == "__main__":
     main()
