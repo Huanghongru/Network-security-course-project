@@ -1,5 +1,15 @@
 # Network Security Project - Attack textbook RSA
 
+## Requirement
+
+> pycrypto 2.6.1
+
+you can install this libray by
+
+```Bash
+pip install pycrypto
+```
+
 ## Part 1
 
 **Goal**: Implement the textbook RSA algorithm (without any padding)
