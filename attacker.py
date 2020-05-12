@@ -22,7 +22,7 @@ class Attacker(Client):
 
         k_b = 0
         for b in range(127, -1, -1):
-            C_b = [C[0] * ((1 << b*e) % n) % n]
+            C_b = [c * ((1 << b*e) % n) % n for c in C]
 
             aes_key = utils.bit_mask(128) & (k_b << b)
             aes = AES.new(aes_key.to_bytes(16, 'big'))
@@ -36,6 +36,7 @@ class Attacker(Client):
 
         # use the hacked AES key to encrypt another plain text
         victim_aes = k_b
+        print("hacked aes key: {}".format(victim_aes))
 
         aes = AES.new(victim_aes.to_bytes(16, 'big'))
 
@@ -49,7 +50,7 @@ class Attacker(Client):
 
 
 def test_hack():
-    user1 = Client()
+    user1 = Client(rsa_encode_method = "naive")
     req1 = user1.send_request("wei cheng yong xiao is a good man.")
 
     server = Server()
@@ -58,4 +59,3 @@ def test_hack():
     attacker = Attacker()
     attacker.hack(user1.rsa.public_key, req1, server)
 
-test_hack()

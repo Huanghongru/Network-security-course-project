@@ -27,9 +27,9 @@ def WUP(content: str, mac: str, imei: str) -> List[bytes]:
 
 
 class Client(object):
-    def __init__(self):
+    def __init__(self, rsa_encode_method: str = "oaep"):
         self.id = random.randint(0, 1 << 64)
-        self.rsa = RSA()    # RSA key pair of this user
+        self.rsa = RSA(encode_method = rsa_encode_method)    # RSA key pair of this user
         self.rsa.generate_key_pairs()
 
         self.mac = str(random.randint(1000000, 9999999))   # MAC address of user
@@ -77,8 +77,8 @@ class Server(object):
         if request_user_id not in self.client2rsa.keys():
             print("The user of this request is not registered !")
             return False
-        aes_key = self.client2rsa[request_user_id].decrypt(encrypted_aes_key)
-        aes_key = aes_key[0] & utils.bit_mask(128)
+        aes_key = self.client2rsa[request_user_id].decrypt(encrypted_aes_key, "int")
+        aes_key = aes_key & utils.bit_mask(128)
         aes = AES.new(aes_key.to_bytes(16, 'big'))
 
         # decrypt the WUP request using the AES session key
@@ -103,7 +103,7 @@ class Server(object):
 
 def test_communicate():
     user1 = Client()
-    user2 = Client()
+    user2 = Client("naive")
     user3 = Client()
     server = Server()
     server.register(user1)
@@ -113,7 +113,7 @@ def test_communicate():
     req1 = user1.send_request("hello world")
 
     # user2 -> server
-    req2 = user2.send_request("network security")
+    req2 = user2.send_request("wei cheng yong xiao is a good man.")
 
     # user3 -> server
     req3 = user3.send_request("unregistered request")
@@ -127,4 +127,3 @@ def test_communicate():
     # server -> user1
     print(server.process_request(req1))
 
-# test_communicate()
