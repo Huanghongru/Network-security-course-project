@@ -2,7 +2,7 @@
 
 ## Requirement
 
-> pycrypto 2.6.1
+* pycrypto 2.6.1
 
 you can install this libray by
 
@@ -16,8 +16,8 @@ pip install pycrypto
 
 The code for this part is mainly in [rsa.py](https://github.com/Huanghongru/Network-security-course-project/blob/master/rsa.py) and it is able to:
 
-* **Generate** a random RSA key pair with a given key size (e.g., 1024bit)
-* **Encrypt** a plaintext with the public key
+* **Generate** a random RSA key pair with a given key size (e.g., 1024bit) :white_check_mark:
+* **Encrypt** a plaintext with the public key :white_check_mark:
 * **Decrypt** a ciphertext with the private key
 
 ## Part 2
@@ -37,6 +37,10 @@ The code for this part is mainly in [client\_server.py](https://github.com/Huang
 **Goal**: defend the attack by implementing a RSA-OAEP algorithm. 
 
 The code for this part is mainly in [utils.py](https://github.com/Huanghongru/Network-security-course-project/blob/master/utils.py#L119). It is able to add the OAEP padding module to the textbook RSA implementation.
+
+* add the OAEP padding module to the textbook RSA implementation
+* give a discussion on the advantages of RSA-OAEP compared to the textbook RSA
+* As a bonus, you can futher try to present CCA2 attack to RSA-OAEP to see whether it can thwart the CCA2 attack you have implemented in part 2
 
 Feel free to run:
 
