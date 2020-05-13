@@ -32,6 +32,7 @@ class Client(object):
         self.rsa = RSA(encode_method = rsa_encode_method)    # RSA key pair of this user
         self.rsa.generate_key_pairs()
 
+        # some sensitive private message
         self.mac = str(random.randint(1000000, 9999999))   # MAC address of user
         self.imei = str(random.randint(1000000, 9999999))  # IMEI series
 
@@ -57,6 +58,7 @@ class Client(object):
 
 class Server(object):
     def __init__(self):
+        # store the clients' RSA keys.
         self.client2rsa: Dict[int, RSA] = {}
 
     def register(self, client: Client) -> None:

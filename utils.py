@@ -9,7 +9,7 @@ def is_prime(n: int, k: int=128):
     see here: https://medium.com/@prudywsh/how-to-generate-big-prime-numbers-miller-rabin-49e6e6af32fb
 
     It is a random algorithm to check whether a large (e.g. 1024bit) number 
-    is prime. The running time is about O(1)
+    is prime. The running time is O(klog^3 n)
     """
     if n == 2 or n == 3:
         return True
@@ -22,6 +22,7 @@ def is_prime(n: int, k: int=128):
         s += 1
         r //= 2
 
+    # perform k rounds
     for _ in range(k):
         a = randrange(2, n-1)
         x = pow(a, r, n)
@@ -36,10 +37,18 @@ def is_prime(n: int, k: int=128):
                 return False
     return True
 
-def randint_with_bit_size(size):
+def randint_with_bit_size(size: int) -> int:
+    """sample a random int with given bit size.
+    the significant bit is guaranteed to be one
+    """
     p = getrandbits(size)
-    p |= (1 << size-1) | 1
+    p |= (1 << size-1)
     return p
+
+def get_prime_candidate(size: int) -> int:
+    """sample a prime candidate, which must be odd
+    """
+    return randint_with_bit_size(size) | 1
 
 def byte_size(num: int) -> int:
     return num.bit_length() // 8 + 1
@@ -51,12 +60,12 @@ def bit_mask(size: int) -> int:
     return mask
 
 def sample_prime_with_bit_size(size: int, silence=True) -> int:
-    num = randint_with_bit_size(size)
+    num = get_prime_candidate(size)
 
     sample_times = 0
     t1 = time.time()
     while not is_prime(num):
-        num = randint_with_bit_size(size)
+        num = get_prime_candidate(size)
         sample_times += 1
     t2 = time.time()
     if not silence:
@@ -100,6 +109,8 @@ def ext_euclid(a: int, b: int) -> Tuple[int, int]:
             t_old, t = t, t_old - q * t
 
     x, y = s_old, t_old
+
+    # obtian a positive x
     x %= b
     while x < 0:
         x += b
@@ -107,7 +118,9 @@ def ext_euclid(a: int, b: int) -> Tuple[int, int]:
 
 def exp_by_square(x: int, n: int) -> int:
     """
-    compute x ^ n in O(logn)
+    compute x ^ n in O(logn).
+
+    Not used. python built-in function pow() is enough and more effective.
     """
     if n == 1:
         return x
@@ -135,7 +148,7 @@ class DataEncoder(object):
         """
         h = hashlib.md5()
 
-        x = x.to_bytes(16, 'big')
+        x = x.to_bytes(128, 'big')
         h.update(x)
         return int.from_bytes(h.digest(), 'big')
 

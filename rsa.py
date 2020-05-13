@@ -41,6 +41,7 @@ class RSA(object):
         # compute integer d s.t. ed - 1 = km
         d, _ = utils.ext_euclid(e, m)
 
+        # keep secret the private key and release the public key
         self.public_key = (n, e)
         self.private_key = (n, d)
         return (n, e)
